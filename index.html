@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DomainFlare AI</title>
+<style>
+  body {
+    margin: 0; min-height: 100vh;
+    background: #05060a;
+    color: #e5e7eb;
+    font-family: sans-serif;
+    padding: 32px 16px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    color: #7dd3fc;
+  }
+  p { text-align: center; color: #9ca3af; }
+  .search {
+    display: flex; gap: 10px;
+    max-width: 600px; margin: 24px auto;
+  }
+  input {
+    flex: 1; padding: 12px;
+    border-radius: 10px; border: 1px solid #333;
+    background: #111; color: white; font-size: 16px;
+  }
+  button {
+    padding: 12px 24px;
+    background: #7dd3fc; color: #000;
+    font-weight: bold; border: none;
+    border-radius: 10px; cursor: pointer;
+  }
+  .card {
+    max-width: 600px; margin: 10px auto;
+    background: #111; border: 1px solid #222;
+    border-radius: 12px; padding: 16px;
+    display: flex; justify-content: space-between;
+  }
+  .available { color: #4ade80; }
+  .taken { color: #f87171; }
+  .unknown { color: #94a3b8; }
+  #status { text-align: center; color: #9ca3af; margin: 16px; }
+</style>
+</head>
+<body>
+  <h1>DomainFlare AI</h1>
+  <p>Generate and check brandable domains instantly</p>
+  <div class="search">
+    <input id="keyword" placeholder="Enter a keyword e.g. fitness" />
+    <button onclick="generate()">Generate</button>
+  </div>
+  <div id="status"></div>
+  <div id="results"></div>
+<script>
+  const API = "https://domainflare-backend-you.onrender.com";
+
+  async function generate() {
+    const keyword = document.getElementById("keyword").value.trim();
+    if (!keyword) return;
+    document.getElementById("status").textContent = "Searching...";
+    document.getElementById("results").innerHTML = "";
+    try {
+      const res = await fetch(`${API}/generate?keyword=${encodeURIComponent(keyword)}&count=12`);
+      const data = await res.json();
+      document.getElementById("status").textContent = data.length + " domains found";
+      data.forEach(d => {
+        document.getElementById("results").innerHTML += `
+          <div class="card">
+            <span>${d.domain}</span>
+            <span class="${d.available}">${d.available}</span>
+            <span style="color:#9ca3af">Score: ${d.score}</span>
+            <span style="color:#9ca3af">$${d.estimated_value}</span>
+          </div>`;
+      });
+    } catch(e) {
+      document.getElementById("status").textContent = "Error connecting to backend.";
+    }
+  }
+</script>
+</body>
+</html>
